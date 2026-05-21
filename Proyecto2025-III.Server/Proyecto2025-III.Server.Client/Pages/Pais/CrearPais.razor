@@ -1,0 +1,74 @@
+﻿@page "/paises/crear"
+@using Microsoft.AspNetCore.Authorization
+@using Proyecto2025_III.Servicio.ServiciosHttp
+@using Proyecto2025_III.Shared.DTO
+@rendermode InteractiveAuto
+@attribute [Authorize]
+@inject IHttpServicio http
+@inject NavigationManager navHttp
+
+<h3>Crear Nuevo Pais</h3>
+
+@* <EditForm Model="pais"  OnValidSubmit="Grabar"> *@
+<EditForm Model="pais" OnValidSubmit="Grabar" FormName="CrearPaisForm">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Alpha3Code</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@pais.Alpha3Code" />
+            <ValidationMessage For="@(() => pais.Alpha3Code)" />
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>Código de Indec</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@pais.CodIndec" />
+            <ValidationMessage For="@(() => pais.CodIndec)" />
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>Código de llamada Internacional</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@pais.CodLlamada" />
+            <ValidationMessage For="@(() => pais.CodLlamada)" />
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label>Nombre del País</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@pais.NombrePais" />
+            <ValidationMessage For="@(() => pais.NombrePais)" />
+        </div>
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">Aceptar</button>
+    <button class="btn btn-primary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+<br />
+<p>@Mensaje</p>
+
+@code {
+    private PaisDTO pais = new PaisDTO();
+    string Mensaje = "";
+
+    private async Task Grabar()
+    {
+        var httpResp = await http.Post<PaisDTO, int>("api/pais", pais);
+        if (!httpResp.Error)
+        {
+            navHttp.NavigateTo("/paises");
+        }
+        else
+        {
+            Mensaje = httpResp.ObtenerError();
+        }
+    }
+
+    private void Cancelar()
+    {
+        navHttp.NavigateTo("/paises");
+    }
+}

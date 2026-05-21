@@ -1,0 +1,119 @@
+﻿@page "/paises"
+@using Proyecto2025_III.Servicio.ServiciosHttp
+@using Proyecto2025_III.Server.Client.Shared
+@using Proyecto2025_III.Shared.DTO
+@rendermode InteractiveAuto
+@inject IHttpServicio http
+<h3>Lista de Paises</h3>
+<AuthorizeView>
+    <Authorized>
+        <br />
+        <a class="btn btn-primary" href="/paises/crear">Nuevo país</a>
+    </Authorized>
+</AuthorizeView>
+<br>
+<table>
+    <tr>
+        <th>Paises</th>
+    </tr>
+    @if (paises == null)
+    {
+        <p>Buscando ....</p>
+    }
+    else if (paises.Count == 0)
+    {
+        <p>No existen paises cargados en esta lista</p>
+    }
+    else
+    {
+        @foreach (var pais in paises)
+        {
+            <tr>
+                <td>@pais.DatosPais</td>
+                <AuthorizeView>
+                    <Authorized>
+                        <td>
+                            <a class="btn btn-primary"
+                                   href="/paises/editar/{pais.Id}">
+                                Editar
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger"
+                                    @onclick="() => Eliminar(pais)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </Authorized>
+                </AuthorizeView>
+            </tr>
+        }
+    }
+</table>
+<br />
+<p>@Mensaje</p>
+<br />
+
+<Confirmacion @ref="confirmacion" 
+              Titulo="Cuidado"
+              textOk="Aceptar"
+              textCancelar="No borrar"
+              onConfirm = "Borrar"
+              onCancel="Cancelar">
+    <p>Está por Borrar un pais.</p>
+    <br />
+    <p>¿Está seguro?</p>
+</Confirmacion>
+
+
+@code {
+    List<PaisListadoDTO>? paises;
+    string Mensaje = "";
+    Confirmacion confirmacion;
+    PaisListadoDTO paisSeleccionado = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LeerPaises();
+    }
+
+    private async Task LeerPaises()
+    {
+        // paises = await http.GetFromJsonAsync<List<PaisListadoDTO>>("api/Pais/listapais");
+        var resp = await http.Get<List<PaisListadoDTO>>("api/pais/listapais");
+        if(!resp.Error)
+        {
+            paises = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = resp.ObtenerError();
+        }
+    }
+
+    private async Task Borrar()
+    {
+        var resp = await http.Delete($"api/pais/{paisSeleccionado.Id}");
+        if(resp.Error)
+        {
+            Mensaje = resp.ObtenerError();
+        }
+        paisSeleccionado = null;
+        confirmacion.Ocultar();
+        await LeerPaises();
+    }
+
+    private async Task Eliminar(PaisListadoDTO pais)
+    {
+        paisSeleccionado = pais;
+        confirmacion.Ver();
+    }
+
+    private void Cancelar()
+    {
+        confirmacion.Ocultar();
+        paisSeleccionado = null;
+    }   
+
+}

@@ -1,0 +1,124 @@
+﻿@page "/usuarios"
+@using Proyecto2025_III.Servicio.ServiciosHttp
+@using Proyecto2025_III.Server.Client.Shared
+@using Proyecto2025_III.Shared.DTO
+@rendermode InteractiveAuto
+@inject IHttpServicio http
+<h3>Lista de Usuarios</h3>
+<br>
+<table>
+    <tr>
+        <th>Usuarios</th>
+    </tr>
+    @if (usuarios == null)
+    {
+        <p>Buscando ....</p>
+    }
+    else if (usuarios.Count == 0)
+    {
+        <p>No existen paises cargados en esta lista</p>
+    }
+    else
+    {
+        @foreach (var usuario in usuarios)
+        {
+            <tr>
+                <td>@usuario.Email</td>
+                <AuthorizeView>
+                    <Authorized>
+                        <td>
+                            <button class="btn btn-primary"
+                                    @onclick="() => HacerAdmin(usuario)">
+                                Hacer Admin
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger"
+                                    @onclick="() => EliminarRol(usuario)">
+                                Remover Admin
+                            </button>
+                        </td>
+                    </Authorized>
+                </AuthorizeView>
+            </tr>
+        }
+    }
+</table>
+<br />
+<p>@Mensaje</p>
+<br />
+
+<Confirmacion @ref="confirmacion"
+              Titulo="Cuidado"
+              textOk="Aceptar"
+              textCancelar="No borrar"
+              onConfirm="RemoverAdmin"
+              onCancel="Cancelar">
+    <p>Está por Remover un usuario del Rol Administrador.</p>
+    <br />
+    <p>¿Está seguro?</p>
+</Confirmacion>
+
+
+@code {
+    List<UsuarioDTO>? usuarios;
+    string Mensaje = "";
+    Confirmacion confirmacion;
+    UsuarioDTO usuarioSeleccionado = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await ObtenerUsuarios();
+    }
+
+    private async Task ObtenerUsuarios()
+    {
+        var resp = await http.Get<List<UsuarioDTO>>("api/admin/obtenerusuarios");
+        if (!resp.Error)
+        {
+            usuarios = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = resp.ObtenerError();
+        }
+    }
+
+    private async Task HacerAdmin(UsuarioDTO usuario)
+    {
+        usuarioSeleccionado = usuario;
+        var resp = await http.Post<UsuarioDTO, object>($"api/admin/haceradmin", usuarioSeleccionado);
+        if (resp.Error)
+        {
+            Mensaje = resp.ObtenerError();
+        }
+        usuarioSeleccionado = null;
+        confirmacion.Ocultar();
+        await ObtenerUsuarios();
+    }
+
+    private async Task RemoverAdmin()
+    {
+        var resp = await http.Delete($"api/admin/{usuarioSeleccionado.Email}");
+        if (resp.Error)
+        {
+            Mensaje = resp.ObtenerError();
+        }
+        usuarioSeleccionado = null;
+        confirmacion.Ocultar();
+        await ObtenerUsuarios();
+    }
+
+    private async Task EliminarRol(UsuarioDTO usuario)
+    {
+        usuarioSeleccionado = usuario;
+        confirmacion.Ver();
+    }
+
+    private void Cancelar()
+    {
+        confirmacion.Ocultar();
+        usuarioSeleccionado = null;
+    }
+}
