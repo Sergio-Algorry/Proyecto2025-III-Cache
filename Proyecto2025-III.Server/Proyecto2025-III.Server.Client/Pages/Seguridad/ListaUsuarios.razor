@@ -2,6 +2,7 @@
 @using Proyecto2025_III.Servicio.ServiciosHttp
 @using Proyecto2025_III.Server.Client.Shared
 @using Proyecto2025_III.Shared.DTO
+@using Proyecto2025_III.Shared.ENUM
 @rendermode InteractiveAuto
 @inject IHttpServicio http
 <h3>Lista de Usuarios</h3>
@@ -88,7 +89,7 @@
     private async Task HacerAdmin(UsuarioDTO usuario)
     {
         usuarioSeleccionado = usuario;
-        var resp = await http.Post<UsuarioDTO, object>($"api/admin/haceradmin", usuarioSeleccionado);
+        var resp = await http.Post<UsuarioDTO, ResultadoOperacionSeguridad>($"api/admin/haceradmin", usuarioSeleccionado);
         if (resp.Error)
         {
             Mensaje = resp.ObtenerError();
@@ -100,7 +101,7 @@
 
     private async Task RemoverAdmin()
     {
-        var resp = await http.Delete($"api/admin/{usuarioSeleccionado.Email}");
+        var resp = await http.Delete($"api/admin/removeradmin/{usuarioSeleccionado.Email}");
         if (resp.Error)
         {
             Mensaje = resp.ObtenerError();

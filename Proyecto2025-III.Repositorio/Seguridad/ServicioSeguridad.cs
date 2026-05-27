@@ -30,13 +30,13 @@ public class ServicioSeguridad : IServicioSeguridad
     {
         try
         {
-            var usuarioLogueado = contextAccesor.HttpContext.User;
-            var resultado = await authorizationService.AuthorizeAsync(usuarioLogueado, "admin");
+            //var usuarioLogueado = contextAccesor.HttpContext.User;
+            //var resultado = await authorizationService.AuthorizeAsync(usuarioLogueado, "admin");
 
-            if (!resultado.Succeeded)
-            {
-                return ResultadoOperacionSeguridad.SinPermiso;
-            }
+            //if (!resultado.Succeeded)
+            //{
+            //    return ResultadoOperacionSeguridad.SinPermiso;
+            //}
             var usuario = await userManager.FindByEmailAsync(entidad.Email);
 
             if (usuario == null)
@@ -57,13 +57,13 @@ public class ServicioSeguridad : IServicioSeguridad
 
     public async Task<ResultadoOperacionSeguridad> RemoverAdmin(string email)
     {
-        var usuarioLogueado = contextAccesor.HttpContext.User;
-        var resultado = await authorizationService.AuthorizeAsync(usuarioLogueado, "admin");
+        //var usuarioLogueado = contextAccesor.HttpContext.User;
+        //var resultado = await authorizationService.AuthorizeAsync(usuarioLogueado, "admin");
 
-        if (!resultado.Succeeded)
-        {
-            return ResultadoOperacionSeguridad.SinPermiso;
-        }
+        //if (!resultado.Succeeded)
+        //{
+        //    return ResultadoOperacionSeguridad.SinPermiso;
+        //}
         var usuario = await userManager.FindByEmailAsync(email);
 
         if (usuario == null)

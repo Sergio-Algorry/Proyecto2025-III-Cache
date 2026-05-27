@@ -45,10 +45,10 @@ namespace Proyecto2025_III.Servicio.ServiciosHttp
 
         }
 
-        public async Task<HttpRespuesta<object>> Delete(string url)
+        public async Task<HttpRespuesta<object?>> Delete(string url)
         {
             var respuesta = await http.DeleteAsync(url);
-            return new HttpRespuesta<object>(null, 
+            return new HttpRespuesta<object?>(null, 
                                              !respuesta.IsSuccessStatusCode, 
                                              respuesta);
         }

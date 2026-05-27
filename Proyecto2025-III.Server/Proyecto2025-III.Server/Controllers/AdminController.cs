@@ -33,7 +33,7 @@ namespace Proyecto2025_III.Server.Controllers
         }
 
         [HttpPost("haceradmin")]
-        public async Task<ActionResult> HacerAdmin(UsuarioDTO usuario)
+        public async Task<ActionResult<ResultadoOperacionSeguridad>> HacerAdmin(UsuarioDTO usuario)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace Proyecto2025_III.Server.Controllers
                 switch (resultado)
                 {
                     case ResultadoOperacionSeguridad.Exitoso:
-                        return NoContent();
+                        return Ok(resultado);
                         break;
                     case ResultadoOperacionSeguridad.Fallido:
                         return BadRequest("Error al crear el registro, VERIFICAR.");
@@ -67,7 +67,7 @@ namespace Proyecto2025_III.Server.Controllers
             switch (resultado)
             {
                 case ResultadoOperacionSeguridad.Exitoso:
-                    return NoContent();
+                    return Ok();
                 case ResultadoOperacionSeguridad.Fallido:
                     return BadRequest("Error al eliminar el registro, VERIFICAR.");
                 case ResultadoOperacionSeguridad.NoEncontrado:
